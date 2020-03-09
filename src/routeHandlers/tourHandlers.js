@@ -6,15 +6,9 @@ const dataDirPath = path.join(__dirname, '../dev-data/data/')
 const simpleToursData = fs.readFileSync(`${dataDirPath}tours-simple.json`)
 
 const getTour = (req, res) => {
-  const { id } = req.params
-  const tour = JSON.parse(simpleToursData).find(item => item.id === Number(id))
-  console.log(tour)
-  if(tour) {
-    return res
-      .status(200)
-      .send(tour)
-  }
-  res.status(404).send('Tour not found')
+  res
+    .status(200)
+    .send(req.tour)
 }
 
 const createTour = (req, res) => {
@@ -36,8 +30,28 @@ const getAllTours = (req, res) => {
     .send(simpleToursData)
 }
 
+const checkTour = (req, res, next, value) => {
+  const tour = JSON.parse(simpleToursData).find(item => item.id === Number(value))
+  if(!tour) {
+    return res.status(404).send('Tour not found')
+  }
+  req.tour = tour
+  next()
+}
+
+const checkBody = (req, res, next) => {
+  if(!req.body.name || !req.body.price){
+    return res
+      .status(400)
+      .send('Request should contain name and price properties')
+  }
+  next()
+}
+
 module.exports = {
   getTour,
   getAllTours,
   createTour,
+  checkTour,
+  checkBody,
 }
