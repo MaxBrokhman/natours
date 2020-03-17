@@ -1,57 +1,62 @@
-const fs = require('fs')
-const path = require('path')
+const { Tour } = require('../models/tourModel')
 
-const dataDirPath = path.join(__dirname, '../dev-data/data/')
-
-const simpleToursData = fs.readFileSync(`${dataDirPath}tours-simple.json`)
-
-const getTour = (req, res) => {
-  res
-    .status(200)
-    .send(req.tour)
+const getTour = async (req, res) => {
+  try {
+    const tour = await Tour.findById(req.params.id)
+    res.status(200).send(tour)
+  } catch (err) {
+    res.status(404).send(err)
+  }
 }
 
-const createTour = (req, res) => {
-  const newId = +simpleToursData[simpleToursData.length - 1].id + 1
-  const newTour = {
-    ...req.body,
-    id: newId
+const createTour = async (req, res) => {
+  try {
+    const newTour = await Tour.create(req.body)
+    res.status(201).send(newTour)
+  } catch (err) {
+    res.status(400).send(err)
   }
-  simpleToursData.push(newTour)
   
-  fs.writeFile(`${dataDirPath}tours-simple.json`, JSON.stringify(simpleToursData), (err) => {
-    res.status(201).send(JSON.stringify(newTour))
-  })
 }
 
-const getAllTours = (req, res) => {
-  res
-    .status(200)
-    .send(simpleToursData)
-}
-
-const checkTour = (req, res, next, value) => {
-  const tour = JSON.parse(simpleToursData).find(item => item.id === Number(value))
-  if(!tour) {
-    return res.status(404).send('Tour not found')
+const getAllTours = async (req, res) => {
+  try {
+    const allTours = Tour.find()
+    res.status(200).send(allTours)
+  } catch (err) {
+    res.status(404).send(err)
   }
-  req.tour = tour
-  next()
 }
 
-const checkBody = (req, res, next) => {
-  if(!req.body.name || !req.body.price){
-    return res
-      .status(400)
-      .send('Request should contain name and price properties')
+const updateTours = async (req, res) => {
+  try {
+    const updatedTour = await Tour.findByIdAndUpdate(
+      req.params.id, 
+      req.body, 
+      {
+        new: true,
+        runValidators: true,
+      },
+    )
+
+    res.status(200).send(updatedTour)
+  } catch (err) {
+    res.status(404).send(err)
   }
-  next()
+}
+
+const deleteTour = async (req, res) => {
+  try {
+    const deletedTour = await Tour.findByIdAndDelete(req.params.id)
+    res.status(200).send(deletedTour)
+  } catch (err) {
+    res.status(404).send(err)
+  }
 }
 
 module.exports = {
   getTour,
   getAllTours,
   createTour,
-  checkTour,
-  checkBody,
+  deleteTour,
 }
