@@ -15,8 +15,16 @@ const tourSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  ratingsAverage: Number,
-  ratingsQuantity: Number,
+  ratingsAverage: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 5,
+  },
+  ratingsQuantity: {
+    type: Number,
+    default: 0,
+  },
   price: {
     type: Number,
     required: true,
@@ -24,6 +32,7 @@ const tourSchema = new mongoose.Schema({
   difficulty: {
     type: String,
     required: true,
+    enum: ['easy', 'medium', 'difficult'],
   },
   discount: Number,
   summary: {
@@ -43,6 +52,7 @@ const tourSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now(),
+    select: false,
   },
   startDates: [Date],
 })
