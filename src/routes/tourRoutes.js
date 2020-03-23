@@ -5,11 +5,12 @@ const {
   getAllTours,
   createTour,
 } = require('../routeHandlers/tourHandlers')
+const { protect } = require('../auth')
 
 const tourRouter = express.Router()
 
 tourRouter.route('/')
-  .get(getAllTours)
+  .get(protect, getAllTours)
   .post(createTour)
 
 tourRouter.route('/:id').get(getTour)

@@ -25,18 +25,21 @@ const userSchema = new mongoose.Schema({
     required: true,
     trim: true,
     minlength: 6,
+    select: false,
   },
   passwordConfirm: {
     type: String,
     required: true,
     trim: true,
     minlength: 6,
+    select: false,
     validate: {
       validator: function(passwordConfirm) {
         return passwordConfirm === this.password
       },
     },
   },
+  passwordChangedAt: Date,
 })
 
 userSchema.pre('save', async function(next) {
@@ -45,6 +48,17 @@ userSchema.pre('save', async function(next) {
   this.passwordConfirm = undefined
   next()
 })
+
+userSchema.methods.changedPassword = function(time) {
+  if (this.passwordChangedAt) {
+    const changeTime = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10,
+    )  
+    return changeTime > time
+  }
+  return false
+}
 
 const User = mongoose.model('User', userSchema)
 
