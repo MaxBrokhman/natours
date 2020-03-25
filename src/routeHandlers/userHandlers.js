@@ -1,3 +1,5 @@
+import { User } from '../models/userModel'
+
 const getAllUsers = (req, res) => {
   res.send(500).send('Error: this route not yet implemented')
 }
@@ -10,12 +12,36 @@ const createUser = (req, res) => {
   res.send(500).send('Error: this route not yet implemented')
 }
 
-const updateUser = (req, res) => {
-  res.send(500).send('Error: this route not yet implemented')
+const filterObj = (obj, ...allowedFields) => {
+  const newObj = {}
+  Object.keys(obj).forEach(key => {
+    if (allowedFields.includes(key)) {
+      newObj[key] = obj[key]
+    }
+  })
+  return newObj
 }
 
-const deleteUser = (req, res) => {
-  res.send(500).send('Error: this route not yet implemented')
+const updateUser = async (req, res, next) => {
+  if (req.body.password || req.body.passwordConfirm) {
+    res.status(400).send('This route is not for password update')
+    return next()
+  }
+
+  const filteredBody = filterObj(req.body, 'name', 'email')
+
+  const updatedUser = await User.findByIdAndUpdate(req.user._id, filteredBody, {
+    new: true,
+    runValidators: true,
+  })
+
+  res.status(200).send(updatedUser)
+}
+
+const deleteUser = async (req, res, next) => {
+  await User.findByIdAndUpdate(req.user._id, { active: false })
+
+  res.status(204).send()
 }
 
 module.exports = {

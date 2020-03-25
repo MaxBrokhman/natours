@@ -1,7 +1,9 @@
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
+const crypto = require('crypto')
 
 const { User } = require('./models/userModel')
+const { sendEmail } = require('./email')
 
 const signToken = id => (
   jwt.sign(
@@ -75,8 +77,91 @@ const protect = async (req, res, next) => {
   }
 }
 
+const restrictTo = (...roles) => (req, res, next) => {
+  if (!roles.includes(req.user.role)) {
+    res.status(403).send('You do not have permission to perform this action')
+    return next()
+  }
+  next()
+}
+
+const forgotPassword = async (req, res, next) => {
+  const user = await User.findOne({ email: req.body.email })
+  if (!user) {
+    res.status(404).send('User with such email does not exist')
+    return next()
+  }
+
+  const resetToken = User.createPasswordResetToken()
+  await user.save({ validateBeforeSave: false })
+
+  const resetURL = `${req.protocol}://${req.get('host')}/api/v1/users/resetPassword/${resetToken}`
+
+  const message = `Forgot your password? Submit a new one: ${resetURL}`
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: 'Your password reset',
+      message,
+    })
+    res.status(200).send('Reset token has been sent')
+    
+  } catch (err) {
+    user.createPasswordResetToken = undefined
+    user.passwordResetExpires = undefined
+    await user.save({ validateBeforeSave: false })
+    res.status(500).send('There was an error with sending email. Please try again later.')
+  }
+  next()
+}
+
+const resetPassword = async (req, res, next) => {
+  const hashedToken = crypto
+                        .createHash('sha256')
+                        .update(req.params.token)
+                        .digest('hex')
+  const user = await User.findOne({
+     passwordResetToken: hashedToken,
+     passwordResetExpires: { $gt: Date.now() },
+  })
+  if (!user) {
+    res.status(400).send('Token is invalid or expired')
+    return next()
+  }
+  user.password = req.body.password
+  user.passwordConfirm = req.body.passwordConfirm
+  user.passwordResetToken = undefined
+  user.passwordResetExpires = undefined
+  await user.save()
+
+  const token = signToken(user._id)
+
+  res.status(200).send(token)
+}
+
+const updatePassword = async (req, res, next) => {
+  const user = await User.findById(req.user._id).select('+password')
+    if (!user || !(await isPasswordsEqual(req.body.passwordCurrent, user.password))) {
+      res.status(401).send('Incorrect password')
+      return next()
+    }
+
+    user.password = req.body.password
+    user.passwordConfirm = req.body.passwordConfirm
+
+    await user.save()
+
+    const token = signToken(user._id)
+    res.status(200).send(token)
+}
+
 module.exports = {
   signUp,
   login,
   protect,
+  restrictTo,
+  forgotPassword,
+  resetPassword,
+  updatePassword,
 }
