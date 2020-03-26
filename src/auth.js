@@ -13,6 +13,23 @@ const signToken = id => (
   )
 )
 
+const cookieOptions = {
+  expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN),
+  secure: true,
+  httpOnly: true,
+}
+
+const createSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id)
+
+  res.cookie('jwt', token, cookieOptions)
+
+  user.token = token
+  user.password = undefined
+
+  res.status(statusCode).send(user)
+}
+
 const isPasswordsEqual = async (inputed, hashed) => (
   await bcrypt.compare(inputed, hashed)
 )
@@ -26,9 +43,7 @@ const signUp = async (req, res, next) => {
       passwordConfirm: req.body.passwordConfirm,
       photo: req.body.photo,
     })
-    const token = signToken(newUser._id)
-    newUser.token = token
-    res.status(201).send(newUser)
+    createSendToken(newUser, 201, res)
     next()
   } catch (err) {
     res.status(400).send(err)
@@ -47,8 +62,7 @@ const login = async (req, res, next) => {
       res.status(401).send('Incorrect email or password')
       return next()
     }
-    const token = signToken(user._id)
-    res.status(200).send(token)
+    createSendToken(user, 200, res)
   } catch (err) {
     res.status(400).send(err)
   }
@@ -135,9 +149,7 @@ const resetPassword = async (req, res, next) => {
   user.passwordResetExpires = undefined
   await user.save()
 
-  const token = signToken(user._id)
-
-  res.status(200).send(token)
+  createSendToken(user, 200, res)
 }
 
 const updatePassword = async (req, res, next) => {
@@ -152,8 +164,7 @@ const updatePassword = async (req, res, next) => {
 
     await user.save()
 
-    const token = signToken(user._id)
-    res.status(200).send(token)
+    createSendToken(user, 200, res)
 }
 
 module.exports = {

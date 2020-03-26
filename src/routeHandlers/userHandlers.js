@@ -1,4 +1,4 @@
-import { User } from '../models/userModel'
+const { User } = require('../models/userModel')
 
 const getAllUsers = (req, res) => {
   res.send(500).send('Error: this route not yet implemented')
