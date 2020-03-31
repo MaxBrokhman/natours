@@ -7,7 +7,7 @@ const {
 } = require('../routeHandlers/reviewHandlers')
 const { protect, restrictTo } = require('../auth')
 
-const reviewRouter = express.Router()
+const reviewRouter = express.Router({ mergeParams: true })
 
 reviewRouter.route('/')
   .get(getAllReviews)

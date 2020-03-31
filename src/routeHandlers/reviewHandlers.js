@@ -10,8 +10,11 @@ const getReview = async (req, res) => {
 }
 
 const getAllReviews = async (req, res) => {
+  const filterObj = req.params.tourId
+    ? { tour: req.params.tourId }
+    : {}
   try {
-    const reviews = await Review.find()
+    const reviews = await Review.find(filterObj)
     res.status(200).send(reviews)
   } catch (err) {
     res.status(404).send(err)
@@ -19,6 +22,8 @@ const getAllReviews = async (req, res) => {
 }
 
 const createReview = async (req, res) => {
+  if (!req.body.tour) req.body.tour = req.params.tourId
+  if (!req.body.user) req.body.user = req.user._id
   try {
     const newReview = await Review.create(req.body) 
     res.status(201).send(newReview)

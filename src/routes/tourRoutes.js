@@ -8,8 +8,11 @@ const {
   updateTours,
 } = require('../routeHandlers/tourHandlers')
 const { protect, restrictTo } = require('../auth')
+const { reviewRouter } = require('./reviewRoutes')
 
 const tourRouter = express.Router()
+
+tourRouter.use('/:tourId/reviews', reviewRouter)
 
 tourRouter.route('/')
   .get(protect, getAllTours)
