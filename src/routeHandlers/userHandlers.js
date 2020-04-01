@@ -4,8 +4,13 @@ const getAllUsers = (req, res) => {
   res.send(500).send('Error: this route not yet implemented')
 }
 
-const getUser = (req, res) => {
-  res.send(500).send('Error: this route not yet implemented')
+const getUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id)
+    res.status(200).send(user)
+  } catch (err) {
+    res.status(404).send(err)
+  }
 }
 
 const createUser = (req, res) => {

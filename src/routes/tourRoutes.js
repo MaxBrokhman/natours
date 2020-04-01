@@ -16,12 +16,20 @@ tourRouter.use('/:tourId/reviews', reviewRouter)
 
 tourRouter.route('/')
   .get(protect, getAllTours)
-  .post(createTour)
+  .post(
+    protect, 
+    restrictTo('admin', 'lead-guide'), 
+    createTour,
+  )
 
 tourRouter
   .route('/:id')
   .get(getTour)
-  .patch(updateTours)
+  .patch(
+    protect, 
+    restrictTo('admin', 'lead-guide'),
+    updateTours,
+  )
   .delete(
     protect, 
     restrictTo('admin', 'lead-guide'), 

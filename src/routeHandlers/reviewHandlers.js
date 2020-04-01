@@ -32,8 +32,36 @@ const createReview = async (req, res) => {
   }
 }
 
+const updateReview = async (req, res) => {
+  try {
+    const updatedReview = await Review.findByIdAndUpdate(
+      req.params.id, 
+      req.body, 
+      {
+        new: true,
+        runValidators: true,
+      },
+    )
+
+    res.status(200).send(updatedReview)
+  } catch (err) {
+    res.status(404).send(err)
+  }
+}
+
+const deleteReview = async (req, res) => {
+  try {
+    const deletedReview = await Review.findByIdAndDelete(req.params.id)
+    res.status(200).send(deletedReview)
+  } catch (err) {
+    res.status(404).send(err)
+  }
+}
+
 module.exports = {
   getReview,
   getAllReviews,
   createReview,
+  updateReview,
+  deleteReview,
 }
