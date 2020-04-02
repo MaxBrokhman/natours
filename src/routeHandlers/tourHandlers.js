@@ -1,5 +1,10 @@
 const { Tour } = require('../models/tourModel')
 
+const EARTH_RADIUS_IN_MILES = 3693.2
+const EARTH_RADIUS_IN_KM = 6378.1
+const KM_MULTIPLIER = 0.001
+const MI_MULTIPLIER = 0.000621371
+
 const getTour = async (req, res) => {
   try {
     const tour = await Tour.findById(req.params.id)
@@ -83,9 +88,75 @@ const deleteTour = async (req, res) => {
   }
 }
 
+const getToursWithin = async (req, res) => {
+  const {
+    distance,
+    center,
+    unit,
+  } = req.params
+  const radius = unit === 'mi' 
+    ? distance / EARTH_RADIUS_IN_MILES
+    : distance / EARTH_RADIUS_IN_KM
+  const [ lat, lng ] = center.split(',')
+  try {
+    const tours = await Tour.find({
+      startLocation: {
+        $geoWithin: {
+          $centerSphere: [
+            [lng, lat],
+            radius,
+          ]
+        },
+      },
+    })
+  
+    res.status(200).send(tours)
+  } catch (err) {
+    res.status(400).send(err)
+  } 
+}
+
+const getDistances = async (req, res) => {
+  const {
+    latlng,
+    unit,
+  } = req.params
+  const [ lat, lng ] = latlng.split(',')
+  const multiplier = unit === 'mi'
+    ? MI_MULTIPLIER
+    : KM_MULTIPLIER
+
+  try {
+    const distances = await Tour.aggregate([
+      {
+        $geoNear: {
+          near: {
+            type: 'Point',
+            coordinates: [Number(lng), Number(lat)],
+          },
+          distanceField: 'distance',
+          distanceMultiplier: multiplier,
+        },
+      },
+      {
+        $project: {
+          distance: 1,
+          name: 1,
+        },
+      },
+    ])
+
+    res.status(200).send(distances)
+  } catch (err) {
+    res.status(400).send(err)
+  }
+}
+
 module.exports = {
   getTour,
   getAllTours,
+  getToursWithin,
+  getDistances,
   createTour,
   updateTours,
   deleteTour,

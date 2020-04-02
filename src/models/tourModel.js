@@ -20,6 +20,7 @@ const tourSchema = new mongoose.Schema({
     default: 0,
     min: 0,
     max: 5,
+    set: value => Number(value.toFixed(1)),
   },
   ratingsQuantity: {
     type: Number,
@@ -90,6 +91,7 @@ const tourSchema = new mongoose.Schema({
 })
 
 tourSchema.index({ price: 1, ratingsAverage: -1 })
+tourSchema.index({ startLocation: '2dsphere' })
 
 tourSchema.pre(/^find/, function (next) {
   this.populate({

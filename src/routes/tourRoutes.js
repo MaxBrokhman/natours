@@ -3,6 +3,8 @@ const express = require('express')
 const {
   getTour,
   getAllTours,
+  getToursWithin,
+  getDistances,
   createTour,
   deleteTour, 
   updateTours,
@@ -11,6 +13,12 @@ const { protect, restrictTo } = require('../auth')
 const { reviewRouter } = require('./reviewRoutes')
 
 const tourRouter = express.Router()
+
+tourRouter.route('/tours-within/:distance/center/:latlng/unit/:unit')
+  .get(getToursWithin)
+
+tourRouter.route('/distances/:latlng/unit/:unit')
+  .get(getDistances)
 
 tourRouter.use('/:tourId/reviews', reviewRouter)
 
