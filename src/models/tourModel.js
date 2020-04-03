@@ -81,7 +81,7 @@ const tourSchema = new mongoose.Schema({
   ],
   guides: [
     {
-      type: mongoose.Schema.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
   ],
@@ -93,6 +93,12 @@ const tourSchema = new mongoose.Schema({
 tourSchema.index({ price: 1, ratingsAverage: -1 })
 tourSchema.index({ startLocation: '2dsphere' })
 
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour',
+  localField: '_id',
+})
+
 tourSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'guides',
@@ -100,13 +106,6 @@ tourSchema.pre(/^find/, function (next) {
   })
   next()
 })
-
-tourSchema.virtual('reviews', {
-  ref: 'Reviews',
-  foreignField: 'tour',
-  localField: '_id',
-})
-
 const Tour = mongoose.model('Tour', tourSchema)
 
 module.exports = {

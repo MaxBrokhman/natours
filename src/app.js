@@ -4,12 +4,18 @@ const helmet = require('helmet')
 const mongoSanitize = require('express-mongo-sanitize')
 const xssClean = require('xss-clean')
 const hpp = require('hpp')
+const path = require('path')
 
 const { tourRouter } = require('./routes/tourRoutes')
 const { userRouter } = require('./routes/userRoutes')
 const { reviewRouter } = require('./routes/reviewRoutes')
+const { viewRouter } = require('./routes/viewRoutes')
 
 const app = express()
+
+app.set('view engine', 'pug')
+app.set('views', path.join(__dirname, 'views'))
+app.use(express.static(path.join(__dirname, '../public')))
 
 const limiter = rateLimit({
   max: 100,
@@ -21,17 +27,24 @@ app.use(helmet())
 app.use('/api', limiter)
 
 app.use(express.json({ limit: '10kb' }))
-app.use(express.static(`${__dirname}/../public`))
 
 app.use(mongoSanitize())
 app.use(xssClean())
 app.use(hpp({
-  whitelist: ['duration', 'ratingsQuantity', 'ratingsAverage', 'price', 'maxGroupSize', 'difficulty'],
+  whitelist: [
+    'duration', 
+    'ratingsQuantity', 
+    'ratingsAverage', 
+    'price', 
+    'maxGroupSize', 
+    'difficulty',
+  ],
 }))
 
+app.use('/', viewRouter)
 app.use('/api/v1/tours', tourRouter)
 app.use('/api/v1/users', userRouter)
-app.use('api/v1/reviews', reviewRouter)
+app.use('/api/v1/reviews', reviewRouter)
 
 module.exports = {
   app,

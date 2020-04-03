@@ -43,7 +43,7 @@ body {
   flex-direction: column;
 }
 
-.main {
+main {
   background-color: #f7f7f7;
   padding: 8rem 6rem;
   -webkit-box-flex: 1;
@@ -298,7 +298,7 @@ body {
   outline-offset: 3px;
 }
 
-.header {
+header {
   background-color: #444;
   padding: 0 5rem;
   height: 8rem;
@@ -315,7 +315,7 @@ body {
   align-items: center;
 }
 @media only screen and (max-width: 62.5em) {
-  .header {
+  header {
     -webkit-box-orient: vertical;
     -webkit-box-direction: normal;
     -ms-flex-direction: column;
@@ -854,7 +854,7 @@ body {
   }
 }
 
-.nav {
+nav {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -863,7 +863,7 @@ body {
   align-items: center;
 }
 @media only screen and (max-width: 37.5em) {
-  .nav {
+  nav {
     -webkit-box-orient: vertical;
     -webkit-box-direction: normal;
     -ms-flex-direction: column;
