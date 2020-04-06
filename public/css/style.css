@@ -1208,6 +1208,7 @@ nav {
   -webkit-box-pack: center;
   -ms-flex-pack: center;
   justify-content: center;
+  flex-direction: column;
   margin-bottom: 1rem;
 }
 .error__emoji {
