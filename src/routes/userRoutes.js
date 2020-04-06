@@ -23,15 +23,13 @@ userRouter.route('/login').post(login)
 userRouter.route('/forgotPassword').post(forgotPassword)
 userRouter.route('/resetPassword/:token').patch(resetPassword)
 
-userRouter.use(protect)
+userRouter.route('/updateMyPassword').patch(protect, updatePassword)
+userRouter.route('/updateProfile').patch(protect, updateUser)
+userRouter.route('/deleteProfile').delete(protect, deleteUser)
 
-userRouter.route('/updateMyPassword').patch(updatePassword)
-userRouter.route('/updateProfile').patch(updateUser)
-userRouter.route('/deleteProfile').delete(deleteUser)
+userRouter.route('/').get(getAllUsers).post(protect, createUser)
 
-userRouter.route('/').get(getAllUsers).post(createUser)
-
-userRouter.route('/me').get(getUser)
+userRouter.route('/me').get(protect, getUser)
 
 module.exports = {
   userRouter,

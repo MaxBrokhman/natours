@@ -55,7 +55,9 @@ const login = async (req, res, next) => {
   try {
     const user = await User.findOne({ email }).select('+password')
     if (!user || !(await isPasswordsEqual(password, user.password))) {
-      res.status(401).send('Incorrect email or password')
+      res.status(401).send({
+        message: 'Incorrect email or password',
+      })
       return next()
     }
     createSendToken(user, 200, res)
@@ -66,6 +68,7 @@ const login = async (req, res, next) => {
 }
 
 const protect = async (req, res, next) => {
+  console.log('HERE')
   try {
     const headerToken = req.header('Authorization').replace('Bearer ', '')
     const token = headerToken 
