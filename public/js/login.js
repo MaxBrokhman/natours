@@ -10,7 +10,6 @@ const login = async (email, password) => {
       }),
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': 'http://localhost:3000',
       },
     })
     const data = await res.json()

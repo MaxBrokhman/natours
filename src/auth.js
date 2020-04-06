@@ -68,7 +68,6 @@ const login = async (req, res, next) => {
 }
 
 const protect = async (req, res, next) => {
-  console.log('HERE')
   try {
     const headerToken = req.header('Authorization').replace('Bearer ', '')
     const token = headerToken 
