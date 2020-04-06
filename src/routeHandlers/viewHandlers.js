@@ -20,7 +20,14 @@ const getTour = async (req, res) => {
   })
 }
 
+const getLogin = (req, res) => {
+  res.status(200).render('login', {
+    title: 'Login',
+  })
+}
+
 module.exports = {
+  getLogin,
   getOverview,
   getTour,
 }

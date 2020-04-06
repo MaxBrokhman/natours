@@ -13,20 +13,16 @@ const signToken = id => (
   )
 )
 
-const cookieOptions = {
-  expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN),
-  secure: true,
-  httpOnly: true,
-}
-
 const createSendToken = (user, statusCode, res) => {
   const token = signToken(user._id)
-
+  const cookieOptions = {
+    expires: new Date(Date.now() + Number(process.env.JWT_COOKIE_EXPIRES_IN)),
+    // secure: true,
+    httpOnly: true,
+  }
   res.cookie('jwt', token, cookieOptions)
-
   user.token = token
   user.password = undefined
-
   res.status(statusCode).send(user)
 }
 
@@ -51,7 +47,7 @@ const signUp = async (req, res, next) => {
 }
 
 const login = async (req, res, next) => {
-  const { email, password} = req.body
+  const { email, password } = req.body
   if (!email || !password) {
     res.status(400).send('Please provide email and password')
     return next()
@@ -65,12 +61,16 @@ const login = async (req, res, next) => {
     createSendToken(user, 200, res)
   } catch (err) {
     res.status(400).send(err)
+    next()
   }
 }
 
 const protect = async (req, res, next) => {
   try {
-    const token = req.header('Authorization').replace('Bearer ', '')
+    const headerToken = req.header('Authorization').replace('Bearer ', '')
+    const token = headerToken 
+      ? headerToken 
+      : req.cookies.jwt
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
     const existentUser = await User.findById(decoded.id)
     if (!existentUser) {
@@ -89,6 +89,19 @@ const protect = async (req, res, next) => {
     res.status(401).send('Please authentificate')
     next()
   }
+}
+
+const isLoggedIn = async (req, res, next) => {
+  const token = req.cookies && req.cookies.jwt
+  if (token) {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    const existentUser = await User.findById(decoded.id)
+    if (!existentUser) return next()
+    if (existentUser.changedPassword(decoded.iat)) return next()
+    res.locals.user = existentUser
+    return next()
+  } 
+  next()
 }
 
 const restrictTo = (...roles) => (req, res, next) => {
@@ -170,6 +183,7 @@ const updatePassword = async (req, res, next) => {
 module.exports = {
   signUp,
   login,
+  isLoggedIn,
   protect,
   restrictTo,
   forgotPassword,
