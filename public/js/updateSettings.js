@@ -1,8 +1,11 @@
 import { showAlert } from './alerts.js'
 
-const updateData = async (data) => {
+const PASSWORD_URL = '/api/v1/users/updateMyPassword'
+const DATA_URL = '/api/v1/users/updateProfile'
+
+const updateData = async (data, url) => {
   try {
-    const res = await fetch('/api/v1/users/updateProfile', {
+    const res = await fetch(url, {
       method: 'PATCH',
       body: JSON.stringify(data),
       headers: {
@@ -35,7 +38,7 @@ if (accountForm) {
       updates.email = emailInputValue
     }
     const updated = Object.keys(updates).length
-      ? await updateData(updates)
+      ? await updateData(updates, DATA_URL)
       : null
     if (updated && updated.user) {
       initialNameValue = updated.user.name
@@ -44,3 +47,19 @@ if (accountForm) {
     }
   })
 } 
+
+const passwordForm = document.querySelector('.form-user-settings')
+passwordForm && passwordForm.addEventListener('submit', async (evt) => {
+  evt.preventDefault()
+  const passwordCurrent = document.querySelector('#password-current').value
+  const newPassword = document.querySelector('#password').value
+  const passwordConfirm = document.querySelector('#password-confirm').value
+  if (newPassword && newPassword === passwordConfirm) {
+    const res = await updateData({
+      passwordCurrent,
+      password: newPassword,
+      passwordConfirm,
+    }, PASSWORD_URL)
+    res.user && showAlert('success', 'Password successfully updated!')
+  }
+})

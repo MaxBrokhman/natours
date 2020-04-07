@@ -9,7 +9,7 @@ const getTour = async (req, res) => {
   try {
     const tour = await Tour.findById(req.params.id)
     res.status(200).send({
-      data: tour,
+      tour,
     })
   } catch (err) {
     res.status(404).send({
@@ -22,7 +22,7 @@ const createTour = async (req, res) => {
   try {
     const newTour = await Tour.create(req.body)
     res.status(201).send({
-      data: newTour,
+      tour: newTour,
     })
   } catch (err) {
     res.status(400).send({
@@ -65,7 +65,7 @@ const getAllTours = async (req, res) => {
 
     const tours = await query
     res.status(200).send({
-      data: tours,
+      tours,
     })
   } catch (err) {
     res.status(404).send({
@@ -86,7 +86,7 @@ const updateTours = async (req, res) => {
     )
 
     res.status(200).send({
-      data: updatedTour,
+      tour: updatedTour,
     })
   } catch (err) {
     res.status(404).send({
@@ -99,7 +99,7 @@ const deleteTour = async (req, res) => {
   try {
     const deletedTour = await Tour.findByIdAndDelete(req.params.id)
     res.status(200).send({
-      data: deletedTour,
+      tour: deletedTour,
     })
   } catch (err) {
     res.status(404).send({
@@ -131,7 +131,7 @@ const getToursWithin = async (req, res) => {
     })
   
     res.status(200).send({
-      data: tours,
+      tours,
     })
   } catch (err) {
     res.status(400).send({
@@ -171,7 +171,7 @@ const getDistances = async (req, res) => {
     ])
 
     res.status(200).send({
-      data: distances,
+      distances,
     })
   } catch (err) {
     res.status(400).send({

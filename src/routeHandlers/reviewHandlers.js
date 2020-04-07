@@ -4,7 +4,7 @@ const getReview = async (req, res) => {
   try {
     const review = await Review.findById(req.params.id)
     res.status(200).send({
-      data: review,
+      review,
     })
   } catch (err) {
     res.status(404).send(err)
@@ -18,7 +18,7 @@ const getAllReviews = async (req, res) => {
   try {
     const reviews = await Review.find(filterObj)
     res.status(200).send({
-      data: reviews,
+      reviews,
     })
   } catch (err) {
     res.status(404).send({
@@ -33,7 +33,7 @@ const createReview = async (req, res) => {
   try {
     const newReview = await Review.create(req.body) 
     res.status(201).send({
-      data: newReview,
+      review: newReview,
     })
   } catch (err) {
     res.status(400).send({
@@ -54,7 +54,7 @@ const updateReview = async (req, res) => {
     )
 
     res.status(200).send({
-      data: updatedReview,
+      review: updatedReview,
     })
   } catch (err) {
     res.status(400).send({
@@ -67,7 +67,7 @@ const deleteReview = async (req, res) => {
   try {
     const deletedReview = await Review.findByIdAndDelete(req.params.id)
     res.status(200).send({
-      data: deletedReview,
+      review: deletedReview,
     })
   } catch (err) {
     res.status(404).send({

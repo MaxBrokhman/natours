@@ -10,7 +10,7 @@ const getUser = async (req, res) => {
   try {
     const user = await User.findById(req.user._id)
     res.status(200).send({
-      data: user,
+      user,
     })
   } catch (err) {
     res.status(404).send({
