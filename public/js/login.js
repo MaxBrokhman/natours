@@ -35,7 +35,7 @@ const logout = async () => {
   }
 }
 
-const form = document.querySelector('.form')
+const form = document.querySelector('.form-login')
 form && form.addEventListener('submit', (evt) => {
   evt.preventDefault()
   const email = document.querySelector('#email').value
