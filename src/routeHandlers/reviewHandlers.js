@@ -3,7 +3,9 @@ const { Review } = require('../models/reviewModel')
 const getReview = async (req, res) => {
   try {
     const review = await Review.findById(req.params.id)
-    res.status(200).send(review)
+    res.status(200).send({
+      data: review,
+    })
   } catch (err) {
     res.status(404).send(err)
   }
@@ -15,9 +17,13 @@ const getAllReviews = async (req, res) => {
     : {}
   try {
     const reviews = await Review.find(filterObj)
-    res.status(200).send(reviews)
+    res.status(200).send({
+      data: reviews,
+    })
   } catch (err) {
-    res.status(404).send(err)
+    res.status(404).send({
+      message: 'There is no reviews for this tour',
+    })
   }
 }
 
@@ -26,9 +32,13 @@ const createReview = async (req, res) => {
   if (!req.body.user) req.body.user = req.user._id
   try {
     const newReview = await Review.create(req.body) 
-    res.status(201).send(newReview)
+    res.status(201).send({
+      data: newReview,
+    })
   } catch (err) {
-    res.status(400).send(err)
+    res.status(400).send({
+      message: 'Error creating the review. Please try again later',
+    })
   }
 }
 
@@ -43,18 +53,26 @@ const updateReview = async (req, res) => {
       },
     )
 
-    res.status(200).send(updatedReview)
+    res.status(200).send({
+      data: updatedReview,
+    })
   } catch (err) {
-    res.status(404).send(err)
+    res.status(400).send({
+      message: 'Error updating the review. Please try again later',
+    })
   }
 }
 
 const deleteReview = async (req, res) => {
   try {
     const deletedReview = await Review.findByIdAndDelete(req.params.id)
-    res.status(200).send(deletedReview)
+    res.status(200).send({
+      data: deletedReview,
+    })
   } catch (err) {
-    res.status(404).send(err)
+    res.status(404).send({
+      message: 'Error deleting the review. Please try again later',
+    })
   }
 }
 

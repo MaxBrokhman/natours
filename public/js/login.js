@@ -23,10 +23,28 @@ const login = async (email, password) => {
     showAlert('error', err.message)
   }
 }
+
+const logout = async () => {
+  try {
+    const res = await fetch('/api/v1/users/logout', {
+      method: 'GET',
+    })
+    res.ok && window.location.assign('/')
+  } catch (err) {
+    showAlert('error', 'Error logging out. Please try again later.')
+  }
+}
+
 const form = document.querySelector('.form')
 form && form.addEventListener('submit', (evt) => {
   evt.preventDefault()
   const email = document.querySelector('#email').value
   const password = document.querySelector('#password').value
   login(email, password)
+})
+
+const logoutBtn = document.querySelector('.nav__el--logout')
+logoutBtn && logoutBtn.addEventListener('click', (evt) => {
+  evt.preventDefault()
+  logout()
 })

@@ -1,7 +1,6 @@
 const express = require('express')
 
 const {
-  becomeLogout,
   getLogin,
   getOverview,
   getTour,
@@ -9,8 +8,6 @@ const {
 const { isLoggedIn } = require('../auth')
 
 const viewRouter = express.Router()
-
-viewRouter.get('/logout', becomeLogout)
 
 viewRouter.use(isLoggedIn)
 

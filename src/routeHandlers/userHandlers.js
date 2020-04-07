@@ -1,20 +1,28 @@
 const { User } = require('../models/userModel')
 
 const getAllUsers = (req, res) => {
-  res.send(500).send('Error: this route not yet implemented')
+  res.send(500).send({
+    message: 'this route not yet implemented',
+  })
 }
 
 const getUser = async (req, res) => {
   try {
     const user = await User.findById(req.user._id)
-    res.status(200).send(user)
+    res.status(200).send({
+      data: user,
+    })
   } catch (err) {
-    res.status(404).send(err)
+    res.status(404).send({
+      message: 'User not found',
+    })
   }
 }
 
 const createUser = (req, res) => {
-  res.send(500).send('Error: this route not yet implemented')
+  res.send(500).send({
+    message: 'this route not yet implemented',
+  })
 }
 
 const filterObj = (obj, ...allowedFields) => {
@@ -29,7 +37,9 @@ const filterObj = (obj, ...allowedFields) => {
 
 const updateUser = async (req, res, next) => {
   if (req.body.password || req.body.passwordConfirm) {
-    res.status(400).send('This route is not for password update')
+    res.status(400).send({
+      message: 'This route is not for password update',
+    })
     return next()
   }
 
@@ -40,13 +50,20 @@ const updateUser = async (req, res, next) => {
     runValidators: true,
   })
 
-  res.status(200).send(updatedUser)
+  res.status(200).send({
+    data: updatedUser,
+  })
 }
 
 const deleteUser = async (req, res, next) => {
-  await User.findByIdAndUpdate(req.user._id, { active: false })
-
-  res.status(204).send()
+  try {
+    await User.findByIdAndUpdate(req.user._id, { active: false })
+    res.status(204).send()
+  } catch (err) {
+    res.status(400).send({
+      message: 'Error deleting the user. Please try again later',
+    })
+  }
 }
 
 module.exports = {

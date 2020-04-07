@@ -8,18 +8,26 @@ const MI_MULTIPLIER = 0.000621371
 const getTour = async (req, res) => {
   try {
     const tour = await Tour.findById(req.params.id)
-    res.status(200).send(tour)
+    res.status(200).send({
+      data: tour,
+    })
   } catch (err) {
-    res.status(404).send(err)
+    res.status(404).send({
+      message: 'Tour not found',
+    })
   }
 }
 
 const createTour = async (req, res) => {
   try {
     const newTour = await Tour.create(req.body)
-    res.status(201).send(newTour)
+    res.status(201).send({
+      data: newTour,
+    })
   } catch (err) {
-    res.status(400).send(err)
+    res.status(400).send({
+      message: 'Error creating the tour. Please try again later',
+    })
   }
 }
 
@@ -56,9 +64,13 @@ const getAllTours = async (req, res) => {
     }
 
     const tours = await query
-    res.status(200).send(tours)
+    res.status(200).send({
+      data: tours,
+    })
   } catch (err) {
-    res.status(404).send(err)
+    res.status(404).send({
+      message: 'Tours not found',
+    })
   }
 }
 
@@ -73,18 +85,26 @@ const updateTours = async (req, res) => {
       },
     )
 
-    res.status(200).send(updatedTour)
+    res.status(200).send({
+      data: updatedTour,
+    })
   } catch (err) {
-    res.status(404).send(err)
+    res.status(404).send({
+      message: 'Error updating the tour. Please try again later',
+    })
   }
 }
 
 const deleteTour = async (req, res) => {
   try {
     const deletedTour = await Tour.findByIdAndDelete(req.params.id)
-    res.status(200).send(deletedTour)
+    res.status(200).send({
+      data: deletedTour,
+    })
   } catch (err) {
-    res.status(404).send(err)
+    res.status(404).send({
+      message: 'Error deleting the tour. Please try again later',
+    })
   }
 }
 
@@ -110,9 +130,13 @@ const getToursWithin = async (req, res) => {
       },
     })
   
-    res.status(200).send(tours)
+    res.status(200).send({
+      data: tours,
+    })
   } catch (err) {
-    res.status(400).send(err)
+    res.status(400).send({
+      message: 'Error getting the tours within the distance',
+    })
   } 
 }
 
@@ -146,9 +170,13 @@ const getDistances = async (req, res) => {
       },
     ])
 
-    res.status(200).send(distances)
+    res.status(200).send({
+      data: distances,
+    })
   } catch (err) {
-    res.status(400).send(err)
+    res.status(400).send({
+      message: 'Distances cannot be get',
+    })
   }
 }
 

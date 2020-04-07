@@ -9,4 +9,5 @@ export const showAlert = (type, message) => {
   alert.className = `alert alert--${type}`
   alert.textContent = message
   document.body.insertAdjacentElement('afterbegin', alert)
+  setTimeout(hideAlert, 1000)
 }

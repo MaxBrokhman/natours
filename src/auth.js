@@ -23,7 +23,9 @@ const createSendToken = (user, statusCode, res) => {
   res.cookie('jwt', token, cookieOptions)
   user.token = token
   user.password = undefined
-  res.status(statusCode).send(user)
+  res.status(statusCode).send({
+    data: user,
+  })
 }
 
 const isPasswordsEqual = async (inputed, hashed) => (
@@ -42,14 +44,18 @@ const signUp = async (req, res, next) => {
     createSendToken(newUser, 201, res)
     next()
   } catch (err) {
-    res.status(400).send(err)
+    res.status(400).send({
+      message: 'Error signing up. Please try again later',
+    })
   }
 }
 
 const login = async (req, res, next) => {
   const { email, password } = req.body
   if (!email || !password) {
-    res.status(400).send('Please provide email and password')
+    res.status(400).send({
+      message: 'Please provide email and password',
+    })
     return next()
   }
   try {
@@ -62,9 +68,16 @@ const login = async (req, res, next) => {
     }
     createSendToken(user, 200, res)
   } catch (err) {
-    res.status(400).send(err)
+    res.status(400).send({
+      message: 'Error logging in. Please try again later',
+    })
     next()
   }
+}
+
+const logout = (req, res) => {
+  res.clearCookie('jwt')
+  res.status(200).send()
 }
 
 const protect = async (req, res, next) => {
@@ -76,19 +89,25 @@ const protect = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
     const existentUser = await User.findById(decoded.id)
     if (!existentUser) {
-      res.status(401).send('User does not exist')
+      res.status(401).send({
+        message: 'User does not exist',
+      })
       return next()
     }
 
     if (existentUser.changedPassword(decoded.iat)) {
-      res.status(401).send('Password was changed. Please log in')
+      res.status(401).send({
+        message: 'Password was changed. Please log in',
+      })
       return next()
     }
     req.user = existentUser
     next()
 
   } catch (err) {
-    res.status(401).send('Please authentificate')
+    res.status(401).send({
+      message: 'Please authentificate',
+    })
     next()
   }
 }
@@ -108,7 +127,9 @@ const isLoggedIn = async (req, res, next) => {
 
 const restrictTo = (...roles) => (req, res, next) => {
   if (!roles.includes(req.user.role)) {
-    res.status(403).send('You do not have permission to perform this action')
+    res.status(403).send({
+      message: 'You do not have permission to perform this action',
+    })
     return next()
   }
   next()
@@ -117,7 +138,9 @@ const restrictTo = (...roles) => (req, res, next) => {
 const forgotPassword = async (req, res, next) => {
   const user = await User.findOne({ email: req.body.email })
   if (!user) {
-    res.status(404).send('User with such email does not exist')
+    res.status(404).send({
+      message: 'User with such email does not exist',
+    })
     return next()
   }
 
@@ -134,13 +157,17 @@ const forgotPassword = async (req, res, next) => {
       subject: 'Your password reset',
       message,
     })
-    res.status(200).send('Reset token has been sent')
+    res.status(200).send({
+      message: 'Reset token has been sent',
+    })
     
   } catch (err) {
     user.createPasswordResetToken = undefined
     user.passwordResetExpires = undefined
     await user.save({ validateBeforeSave: false })
-    res.status(500).send('There was an error with sending email. Please try again later.')
+    res.status(500).send({
+      message: 'There was an error with sending email. Please try again later.',
+    })
   }
   next()
 }
@@ -155,7 +182,9 @@ const resetPassword = async (req, res, next) => {
      passwordResetExpires: { $gt: Date.now() },
   })
   if (!user) {
-    res.status(400).send('Token is invalid or expired')
+    res.status(400).send({
+      message: 'Token is invalid or expired',
+    })
     return next()
   }
   user.password = req.body.password
@@ -170,7 +199,9 @@ const resetPassword = async (req, res, next) => {
 const updatePassword = async (req, res, next) => {
   const user = await User.findById(req.user._id).select('+password')
     if (!user || !(await isPasswordsEqual(req.body.passwordCurrent, user.password))) {
-      res.status(401).send('Incorrect password')
+      res.status(401).send({
+        message: 'Incorrect password',
+      })
       return next()
     }
 
@@ -184,6 +215,7 @@ const updatePassword = async (req, res, next) => {
 
 module.exports = {
   signUp,
+  logout,
   login,
   isLoggedIn,
   protect,
