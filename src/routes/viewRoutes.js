@@ -4,17 +4,17 @@ const {
   getLogin,
   getOverview,
   getTour,
+  getAccount,
 } = require('../routeHandlers/viewHandlers')
-const { isLoggedIn } = require('../auth')
+const { isLoggedIn, protect } = require('../auth')
 
 const viewRouter = express.Router()
 
-viewRouter.use(isLoggedIn)
-
-viewRouter.get('/', getOverview)
-viewRouter.get('/overview', getOverview)
-viewRouter.get('/tour/:id', getTour)
-viewRouter.get('/login', getLogin)
+viewRouter.get('/', isLoggedIn, getOverview)
+viewRouter.get('/overview', isLoggedIn, getOverview)
+viewRouter.get('/tour/:id', isLoggedIn, getTour)
+viewRouter.get('/login', isLoggedIn, getLogin)
+viewRouter.get('/me', protect, getAccount)
 
 module.exports = {
   viewRouter,

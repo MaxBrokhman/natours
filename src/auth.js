@@ -82,9 +82,9 @@ const logout = (req, res) => {
 
 const protect = async (req, res, next) => {
   try {
-    const headerToken = req.header('Authorization').replace('Bearer ', '')
+    const headerToken = req.header('Authorization')
     const token = headerToken 
-      ? headerToken 
+      ? headerToken.replace('Bearer ', '')
       : req.cookies.jwt
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
     const existentUser = await User.findById(decoded.id)
@@ -101,7 +101,7 @@ const protect = async (req, res, next) => {
       })
       return next()
     }
-    req.user = existentUser
+    req.user = res.locals.user = existentUser
     next()
 
   } catch (err) {

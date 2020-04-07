@@ -781,6 +781,7 @@ header {
   );
   background-image: linear-gradient(to right bottom, #7dd56f, #28b487);
   padding: 4rem 0;
+  flex-direction: column;
 }
 .user-view__content {
   -webkit-box-flex: 1;
