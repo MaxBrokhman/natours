@@ -7,10 +7,7 @@ const updateData = async (data, url) => {
   try {
     const res = await fetch(url, {
       method: 'PATCH',
-      body: JSON.stringify(data),
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      body: data,
     })
     const updatedData = await res.json()
     if (!res.ok || !updatedData) return showAlert('error', 'Update failed')
@@ -27,18 +24,27 @@ if (accountForm) {
   accountForm.addEventListener('submit', async (evt) => {
     evt.preventDefault()
     const updates = {}
+    const formData = new FormData()
     const nameInput = document.querySelector('#name')
     const emailInput = document.querySelector('#email')
+    const photoInput = document.querySelector('#photo')
     const nameInputValue = nameInput.value
     const emailInputValue = emailInput.value
+    const photoInputValue = photoInput.files[0]
     if (nameInputValue && nameInputValue !== initialNameValue) {
-      updates.name = nameInputValue
+      formData.append('name', nameInputValue)
+      updates['name'] = true
     }
     if (emailInputValue && emailInputValue !== initialEmailValue) {
-      updates.email = emailInputValue
+      formData.append('email', emailInputValue)
+      updates['email'] = true
+    }
+    if (photoInputValue) {
+      formData.append('photo', photoInputValue)
+      updates['photo'] = true
     }
     const updated = Object.keys(updates).length
-      ? await updateData(updates, DATA_URL)
+      ? await updateData(formData, DATA_URL)
       : null
     if (updated && updated.user) {
       initialNameValue = updated.user.name
